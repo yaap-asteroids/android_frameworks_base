@@ -1527,6 +1527,27 @@ public class ComputerEngine implements Computer {
                 return null;
             }
 
+            if ("android".equals(p.getPackageName())
+                    && UserHandle.getUserId(callingUid) == UserHandle.USER_SYSTEM) {
+                try {
+                    String[] callingPackages = getPackagesForUid(callingUid);
+                    if (callingPackages != null && java.util.Arrays.asList(callingPackages)
+                            .contains("com.google.android.gms")) {
+                        var pif = android.security.pif.PlayIntegritySpoofService.getInstance();
+                        if (pif.isSpoofSignatureEnabled()) {
+                            Signature signature = new Signature(pif.getRomSignatureBytes());
+                            packageInfo.signatures = new Signature[] {signature};
+                            packageInfo.signingInfo = new SigningInfo(new SigningDetails(
+                                    packageInfo.signatures,
+                                    SigningDetails.SignatureSchemeVersion.SIGNING_BLOCK_V3,
+                                    SigningDetails.toSigningKeys(packageInfo.signatures), null));
+                        }
+                    }
+                } catch (Exception e) {
+                    Slog.w(TAG, "Cannot apply PIF platform signature", e);
+                }
+            }
+
             packageInfo.packageName = packageInfo.applicationInfo.packageName =
                     resolveExternalPackageName(p);
 

@@ -1066,4 +1066,16 @@ interface IActivityManager {
      * Unregisters the listener previously registered for ANR warning.
      */
     void unregisterAnrWarningListener(in IAnrWarningCallback callback);
+
+    // AOSPA device integrity (hidden, access enforced in ActivityManagerService).
+    String getSpoofPifConfig();
+    String getSpoofTrickyStoreTarget();
+    String getSpoofTrickyStoreKeyBox();
+    String getSpoofTrickyStorePatch();
+    Bundle getDuckRkpState();
+    void setDuckRkpEnabled(boolean enabled);
+    void provisionDuckRkp();
+    void setSpoofTrickyStoreKeyBox(String keybox);
+    Bundle getDeviceIntegrityConfig();
+    void setDeviceIntegrityConfig(in Bundle config);
 }

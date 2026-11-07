@@ -7670,6 +7670,17 @@ public final class Settings {
      * or by calling the "put" methods that this class contains.
      */
     public static final class Secure extends NameValueTable {
+        /**
+         * Master switch for device integrity compatibility.
+         * @hide
+         */
+        public static final String DEVICE_INTEGRITY_ENABLED = "spoof_trickystore_enabled";
+
+        /** @hide */
+        public static final String SPOOF_DUCK_RKP_ENABLED = "spoof_duck_rkp_enabled";
+        /** @hide */
+        public static final String SPOOF_TRICKYSTORE_KEYBOX = "spoof_trickystore_keybox";
+
         // NOTE: If you add new settings here, be sure to add them to
         // com.android.providers.settings.SettingsProtoDumpUtil#dumpProtoSecureSettingsLocked.
 

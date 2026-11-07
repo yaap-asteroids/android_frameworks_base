@@ -3582,6 +3582,8 @@ public final class SystemServer implements Dumpable {
         mActivityManagerService.systemReady(() -> {
             Slog.i(TAG, "Making services ready");
             t.traceBegin("StartActivityManagerReadyPhase");
+            mSystemServiceManager.startService(
+                    com.android.server.security.rkp.DeviceIntegrityManager.class);
             mSystemServiceManager.startBootPhase(t, SystemService.PHASE_ACTIVITY_MANAGER_READY);
             t.traceEnd();
             t.traceBegin("StartObservingNativeCrashes");

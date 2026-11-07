@@ -209,6 +209,7 @@ java_library_static {
         "android.hardware.light-V3-java", // AIDL
         "android.hardware.security.authgraph-V1-java",
         "android.hardware.security.rkp-V3-java",
+        "vendor.penguin.duckrkp-V1-java",
         "android.hardware.security.secretkeeper-V1-java",
         "android.hardware.tv.cec-V1.1-java",
         "android.hardware.tv.hdmi.cec-V1-java",

@@ -8098,6 +8098,20 @@ public final class ActivityThread extends ClientTransactionHandler
             mConfigurationController.applyCompatConfiguration();
         }
 
+        // PenguinOS PIF hooks run before app class loading and component factories.
+        if (android.os.UserHandle.myUserId() == android.os.UserHandle.USER_SYSTEM
+                && android.security.pif.PlayIntegritySpoofService.isTargetProcess(data.processName)) {
+            var pif = android.security.pif.PlayIntegritySpoofService.getInstance();
+            if (pif.shouldSpoof(data.processName)) {
+                pif.spoofBuildFields(data.processName);
+                if (pif.isDroidGuard(data.processName)) {
+                    pif.spoofProperties();
+                    if (pif.isSpoofProviderEnabled()) pif.spoofProvider();
+                    if (pif.isSpoofSignatureEnabled()) pif.spoofSignature();
+                }
+            }
+        }
+
         final boolean isSdkSandbox = data.sdkSandboxClientAppPackage != null;
         data.info = getPackageInfo(data.appInfo, mCompatibilityInfo, null /* baseLoader */,
                 false /* securityViolation */, true /* includeCode */,

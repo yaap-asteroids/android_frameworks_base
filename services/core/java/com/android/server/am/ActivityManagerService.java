@@ -21475,4 +21475,65 @@ public class ActivityManagerService extends IActivityManager.Stub
         mAnrWarningController.notifyAnrWarning(
                 uid, anrId, errorId, anrType, consumedTimeMs, timeoutMs, description);
     }
+
+    private com.android.server.security.rkp.DeviceIntegrityManager deviceIntegrity() {
+        var manager = LocalServices.getService(
+                com.android.server.security.rkp.DeviceIntegrityManager.class);
+        if (manager == null) throw new IllegalStateException("Device integrity is starting");
+        return manager;
+    }
+
+    private void enforceDeviceIntegrityPermission() {
+        mContext.enforceCallingOrSelfPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS,
+                "Device integrity requires WRITE_SECURE_SETTINGS");
+        if (UserHandle.getUserId(Binder.getCallingUid()) != UserHandle.USER_SYSTEM)
+            throw new SecurityException("Device integrity is managed by the device owner user");
+    }
+
+    @Override public String getSpoofPifConfig() { return deviceIntegrity().pifConfig(); }
+    @Override public String getSpoofTrickyStoreTarget() { return deviceIntegrity().targetConfig(); }
+    @Override public String getSpoofTrickyStoreKeyBox() { return deviceIntegrity().keybox(); }
+    @Override public String getSpoofTrickyStorePatch() { return deviceIntegrity().patchConfig(); }
+
+    @Override public Bundle getDuckRkpState() {
+        enforceDeviceIntegrityPermission();
+        long token = Binder.clearCallingIdentity();
+        try { return deviceIntegrity().duck().getState(); }
+        finally { Binder.restoreCallingIdentity(token); }
+    }
+
+    @Override public void setDuckRkpEnabled(boolean enabled) {
+        enforceDeviceIntegrityPermission();
+        long token = Binder.clearCallingIdentity();
+        try { deviceIntegrity().duck().setEnabled(enabled); }
+        finally { Binder.restoreCallingIdentity(token); }
+    }
+
+    @Override public void provisionDuckRkp() {
+        enforceDeviceIntegrityPermission();
+        long token = Binder.clearCallingIdentity();
+        try { deviceIntegrity().duck().provision(); }
+        finally { Binder.restoreCallingIdentity(token); }
+    }
+
+    @Override public void setSpoofTrickyStoreKeyBox(String keybox) {
+        enforceDeviceIntegrityPermission();
+        long token = Binder.clearCallingIdentity();
+        try { deviceIntegrity().duck().setImportedKeybox(keybox); }
+        finally { Binder.restoreCallingIdentity(token); }
+    }
+
+    @Override public Bundle getDeviceIntegrityConfig() {
+        enforceDeviceIntegrityPermission();
+        long token = Binder.clearCallingIdentity();
+        try { return deviceIntegrity().configuration(); }
+        finally { Binder.restoreCallingIdentity(token); }
+    }
+
+    @Override public void setDeviceIntegrityConfig(Bundle config) {
+        enforceDeviceIntegrityPermission();
+        long token = Binder.clearCallingIdentity();
+        try { deviceIntegrity().configure(config); }
+        finally { Binder.restoreCallingIdentity(token); }
+    }
 }
